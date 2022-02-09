@@ -3,9 +3,11 @@ package ru.a_party.ch3ch2l.view
 import android.os.Bundle
 import android.view.View.GONE
 import android.view.View.VISIBLE
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import ru.a_party.ch3ch2l.MainMVP
 import ru.a_party.ch3ch2l.databinding.ActivityMainBinding
+import ru.a_party.ch3ch2l.model.MainViewModel
 import ru.a_party.ch3ch2l.model.data.AppState
 
 class MainActivity : BaseActivity<AppState>(),SearchFragment.OnClickListener {
@@ -15,6 +17,8 @@ class MainActivity : BaseActivity<AppState>(),SearchFragment.OnClickListener {
     private val adapter by lazy {
         TranslateAdapter()
     }
+
+    private val mainViewModel  = MainViewModel()
 
     private var searchWord:String?=null
 
@@ -28,11 +32,12 @@ class MainActivity : BaseActivity<AppState>(),SearchFragment.OnClickListener {
         }
         binding.rvTranslate.layoutManager = LinearLayoutManager(applicationContext)
         binding.rvTranslate.adapter = adapter
+
+        mainViewModel.appState.observe(this, Observer{
+            renderData(it)
+        })
     }
 
-    override fun createPresenter(): MainMVP.Presenter<AppState, MainMVP.View> {
-        return PresenterImplementation()
-    }
 
     override fun renderData(appState: AppState) {
         when (appState){
@@ -49,7 +54,7 @@ class MainActivity : BaseActivity<AppState>(),SearchFragment.OnClickListener {
                 binding.errorText.text = appState.error.message
                 binding.buttonReload.setOnClickListener {
                     searchWord?.let {
-                            word -> presenter.getData(word,true)
+                            word -> mainViewModel.fetchData(word)
                     }
                 }
             }
@@ -71,6 +76,6 @@ class MainActivity : BaseActivity<AppState>(),SearchFragment.OnClickListener {
 
     override fun onClick(word: String) {
         searchWord = word
-        presenter.getData(word,true)
+        mainViewModel.fetchData(word)
     }
 }

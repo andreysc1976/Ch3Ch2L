@@ -2,4 +2,4 @@
 <resources>
     <dimen name="default_margins">16dp</dimen>
     <dimen name="default_devider_size">4dp</dimen>
-</resources><resources></resources>
+</resources>
